@@ -1,0 +1,40 @@
+﻿<Page x:Class="Abb.Cz.Apps.WattCountdown.Views.CountdownView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:Abb.Cz.Apps.WattCountdown.Views"
+      xmlns:ext="http://schemas.xceed.com/wpf/xaml/toolkit"
+      xmlns:h="clr-namespace:Abb.Cz.Apps.WattCountdown.Helpers"
+      mc:Ignorable="d"
+      DataContext="{Binding CountdownViewModel, Source={StaticResource Locator}}"
+      Title="Time to go home" Height="400" Width="400">
+    <Page.Resources>
+        <h:DoubleToHoursConverter x:Key="HoursConverter"/>
+    </Page.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Time settings" Margin="10" Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Start:" VerticalAlignment="Center"/>
+                <ext:TimePicker Margin="10"/>
+                <Label Content="Lunch:" VerticalAlignment="Center"/>
+                <ext:TimePicker Margin="10"/>
+                <Label Content="End:" VerticalAlignment="Center"/>
+                <ext:TimePicker Margin="10"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox HeaderStringFormat="Work time: {0}" Header="{Binding Value, ElementName=WorkTime, Converter={StaticResource HoursConverter}}" Margin="10" Grid.Row="1">
+            <Slider x:Name="WorkTime" Margin="10,0,10,0" VerticalAlignment="Top" LargeChange="2" Maximum="16" SmallChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="True" Value="{Binding WorkTime}"/>
+        </GroupBox>
+        <GroupBox Header="Time to go" Margin="10" Grid.Row="2"></GroupBox>
+        <GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3"></GroupBox>
+        <GroupBox Header="Application settings" Margin="10" Grid.Row="4"></GroupBox>
+    </Grid>
+</Page>

@@ -12,6 +12,8 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using Abb.Cz.Apps.WattCountdown.Interfaces;
+using Abb.Cz.Apps.WattCountdown.Services;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
@@ -44,23 +46,16 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
             SimpleIoc.Default.Register<LoginViewModel>();
             SimpleIoc.Default.Register<CountdownViewModel>();
+            SimpleIoc.Default.Register<ISettingsService, LocalSettingsService>();
         }
 
         public LoginViewModel LoginViewModel
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<LoginViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<LoginViewModel>();
 
         public CountdownViewModel CountdownViewModel
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<CountdownViewModel>();
-            }
-        }
+            => ServiceLocator.Current.GetInstance<CountdownViewModel>();
+        
+                      
 
         public static void Cleanup()
         {

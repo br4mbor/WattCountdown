@@ -1,4 +1,5 @@
-﻿using Abb.Cz.Apps.WattCountdown.Models;
+﻿using Abb.Cz.Apps.WattCountdown.Interfaces;
+using Abb.Cz.Apps.WattCountdown.Models;
 using Abb.Cz.Apps.WattCountdown.Views;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -15,8 +16,11 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 {
     public class LoginViewModel : ViewModelBase
     {
+        #region Fields
         private LoginModel loginModel = new LoginModel();
+        #endregion
 
+        #region Properties
         public string UserName
         {
             get { return loginModel.UserName; }
@@ -28,42 +32,22 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             get { return loginModel.Password; }
             set { loginModel.Password = value; }
         }
+        #endregion
 
-        //public string ProxyUserName
-        //{
-        //    get { return loginModel.ProxyUserName; }
-        //    set { loginModel.ProxyUserName = value; }
-        //}
-
-        //public string ProxyPassword
-        //{
-        //    get { return loginModel.ProxyPassword; }
-        //    set { loginModel.ProxyPassword = value; }
-        //}
-
-        //public string ProxyAddress
-        //{
-        //    get { return loginModel.ProxyAddress; }
-        //    set { loginModel.ProxyAddress = value; }
-        //}
-
-        //public int ProxyPort
-        //{
-        //    get { return loginModel.ProxyPort; }
-        //    set { loginModel.ProxyPort = value; }
-        //}
-
-        //public bool UseProxy
-        //{
-        //    get { return loginModel.UseProxy; }
-        //    set { loginModel.UseProxy = value; }
-        //}
-
-        public RelayCommand<string> LoginCommand { get; set; }
+        #region Commands
+        public RelayCommand<string> LoginCommand { get; set; } 
+        #endregion
 
         public LoginViewModel()
         {
             LoginCommand = new RelayCommand<string>(Login);
+
+            var settingsService = SimpleIoc.Default.GetInstance<ISettingsService>();
+
+            if (settingsService == null) return;
+
+            UserName = settingsService.UserName;
+            Password = settingsService.Password;
         }
 
         private void Login(string password)

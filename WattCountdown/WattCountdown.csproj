@@ -103,11 +103,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\DoubleToHoursConverter.cs" />
+    <Compile Include="Interfaces\ISettingsService.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\CountdownModel.cs" />
     <Compile Include="PasswordBoxAssistant.cs" />
+    <Compile Include="Services\LocalSettingsService.cs" />
     <Compile Include="ViewModels\CountdownViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

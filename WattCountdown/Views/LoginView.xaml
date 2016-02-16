@@ -6,7 +6,8 @@
       xmlns:local="clr-namespace:Abb.Cz.Apps.WattCountdown.Views"
       mc:Ignorable="d"
       DataContext="{Binding LoginViewModel, Source={StaticResource Locator}}"
-      Title="Login" Height="200" Width="350">
+      Title="Login" Height="200" Width="350"
+      Loaded="Page_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30*"/>

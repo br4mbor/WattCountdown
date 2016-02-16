@@ -1,4 +1,5 @@
-﻿using Abb.Cz.Apps.WattCountdown.ViewModels;
+﻿using Abb.Cz.Apps.WattCountdown.Interfaces;
+using Abb.Cz.Apps.WattCountdown.ViewModels;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Messaging;
 using System;
@@ -30,6 +31,11 @@ namespace Abb.Cz.Apps.WattCountdown.Views
         private void Login_Click(object sender, RoutedEventArgs e)
         {
             SimpleIoc.Default.GetInstance<LoginViewModel>().LoginCommand.Execute(Password.Password);
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Password.Password = SimpleIoc.Default.GetInstance<ISettingsService>().Password;
         }
     }
 }

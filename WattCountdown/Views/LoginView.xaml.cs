@@ -35,7 +35,7 @@ namespace Abb.Cz.Apps.WattCountdown.Views
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            Password.Password = SimpleIoc.Default.GetInstance<ISettingsService>().Password;
+            Password.Password = SimpleIoc.Default.GetInstance<LoginViewModel>().Password;
         }
     }
 }

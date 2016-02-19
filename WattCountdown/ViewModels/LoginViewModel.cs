@@ -53,8 +53,18 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         private void Login(string password)
         {
             Password = password;
+            SaveLoginInfo();
 
             SimpleIoc.Default.GetInstance<NavigationService>().Navigate(new CountdownView());
+        }
+
+        private void SaveLoginInfo()
+        {
+            var settingsService = SimpleIoc.Default.GetInstance<ISettingsService>();
+
+            settingsService.UserName = UserName;
+            settingsService.Password = Password;
+            settingsService.Save();
         }
     }
 }

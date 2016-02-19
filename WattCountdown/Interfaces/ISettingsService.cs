@@ -11,5 +11,7 @@ namespace Abb.Cz.Apps.WattCountdown.Interfaces
         string UserName { get; set; }
 
         string Password { get; set; }
+
+        void Save();
     }
 }

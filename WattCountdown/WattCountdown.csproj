@@ -108,7 +108,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\CountdownModel.cs" />
-    <Compile Include="PasswordBoxAssistant.cs" />
     <Compile Include="Services\LocalSettingsService.cs" />
     <Compile Include="ViewModels\CountdownViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />

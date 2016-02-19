@@ -8,26 +8,26 @@
       xmlns:h="clr-namespace:Abb.Cz.Apps.WattCountdown.Helpers"
       mc:Ignorable="d"
       DataContext="{Binding CountdownViewModel, Source={StaticResource Locator}}"
-      Title="Time to go home" Height="400" Width="400">
+      Title="Time to go home">
     <Page.Resources>
         <h:DoubleToHoursConverter x:Key="HoursConverter"/>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="120"/>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <GroupBox Header="Time settings" Margin="10" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Start:" VerticalAlignment="Center"/>
-                <ext:TimePicker Margin="10"/>
+                <ext:TimePicker Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Start}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="Lunch:" VerticalAlignment="Center"/>
-                <ext:TimePicker Margin="10"/>
+                <ext:TimePicker Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="End:" VerticalAlignment="Center"/>
-                <ext:TimePicker Margin="10"/>
+                <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding End, Mode=OneWay}" Format="Custom" FormatString="HH:mm"/>
             </StackPanel>
         </GroupBox>
         <GroupBox HeaderStringFormat="Work time: {0}" Header="{Binding Value, ElementName=WorkTime, Converter={StaticResource HoursConverter}}" Margin="10" Grid.Row="1">
@@ -35,6 +35,8 @@
         </GroupBox>
         <GroupBox Header="Time to go" Margin="10" Grid.Row="2"></GroupBox>
         <GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3"></GroupBox>
-        <GroupBox Header="Application settings" Margin="10" Grid.Row="4"></GroupBox>
+        <GroupBox Header="Application settings" Margin="10" Grid.Row="4">
+            <Button Content="Show" Click="Button_Click"/>
+        </GroupBox>
     </Grid>
 </Page>

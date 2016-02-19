@@ -34,5 +34,10 @@ namespace Abb.Cz.Apps.WattCountdown.Services
                 Properties.Settings.Default.Password = value;
             }
         }
+
+        public void Save()
+        {
+            Properties.Settings.Default.Save();
+        }
     }
 }

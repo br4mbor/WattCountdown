@@ -35,7 +35,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         #endregion
 
         #region Commands
-        public RelayCommand<string> LoginCommand { get; set; } 
+        public ICommand LoginCommand { get; set; } 
         #endregion
 
         public LoginViewModel()

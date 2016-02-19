@@ -8,20 +8,21 @@ namespace Abb.Cz.Apps.WattCountdown.Models
 {
     public class CountdownModel
     {
-        public DateTime Start { get; set; }
+        public TimeSpan StartTime { get; set; }
 
-        public DateTime End { get; set; }
-
-        public DateTime Lunch { get; set; }
+        public TimeSpan Lunch { get; set; }
 
         public double WorkTime { get; set; }
 
+        public DateTime EndDate { get; set; }
+
         public CountdownModel()
         {
-            Start = DateTime.Now;
+            var now = DateTime.Now;
+            StartTime = now.TimeOfDay.Subtract(new TimeSpan(0, 0, now.TimeOfDay.Seconds));
             WorkTime = 8;
-            Lunch = new DateTime(1, 1, 1, 0, 30, 0);
-            End = Start.AddHours(WorkTime).AddHours(Lunch.Hour).AddMinutes(Lunch.Minute);
+            Lunch = new TimeSpan(0, 30, 0);
+            EndDate = now.Date.Add(StartTime).Add(Lunch).AddHours(WorkTime);
         }
     }
 }

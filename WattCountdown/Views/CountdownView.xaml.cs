@@ -26,12 +26,5 @@ namespace Abb.Cz.Apps.WattCountdown.Views
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var model = SimpleIoc.Default.GetInstance<CountdownViewModel>();
-            var msg = string.Format("Start: {0}\nEnd: {1}\nWorkTime: {2}", model.Start, model.End, model.WorkTime);
-            MessageBox.Show(msg, "Data", MessageBoxButton.OK);
-        }
     }
 }

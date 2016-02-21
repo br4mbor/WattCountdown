@@ -24,18 +24,18 @@
         <GroupBox Header="Time settings" Margin="10" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Start:" VerticalAlignment="Center"/>
-                <ext:TimePicker Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding StartTime, Converter={StaticResource TimeSpanConverter}}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding StartEnabled}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding StartTime, Converter={StaticResource TimeSpanConverter}}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="Lunch:" VerticalAlignment="Center"/>
-                <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch, Converter={StaticResource TimeSpanConverter}}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding LunchEnabled}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch, Converter={StaticResource TimeSpanConverter}}" Format="Custom" FormatString="HH:mm"/>
                 <!--<Label Content="End:" VerticalAlignment="Center"/>
                 <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding EndTime, Mode=OneWay}" Format="Custom" FormatString="HH:mm"/>-->
             </StackPanel>
         </GroupBox>
         <GroupBox HeaderStringFormat="Work time: {0}" Header="{Binding Value, ElementName=WorkTime, Converter={StaticResource HoursConverter}}" Margin="10" Grid.Row="1">
-            <Slider x:Name="WorkTime" Margin="10,0,10,0" VerticalAlignment="Top" LargeChange="2" Maximum="16" SmallChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="True" Value="{Binding WorkTime}"/>
+            <Slider x:Name="WorkTime" IsEnabled="{Binding WorkTimeEnabled}" Margin="10,0,10,0" VerticalAlignment="Top" LargeChange="2" Maximum="16" SmallChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="True" Value="{Binding WorkTime}"/>
         </GroupBox>
         <GroupBox Header="Time to go" Margin="10" Grid.Row="2">
-            <Label Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding TimeToGoLabel, Mode=OneWay}"/>
+            <Label Visibility="{Binding TimeToGoVisible}" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{Binding TimeToGoLabel, Mode=OneWay}"/>
         </GroupBox>
         <GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3"></GroupBox>
         <GroupBox Header="Application settings" Margin="10" Grid.Row="4">

@@ -104,6 +104,8 @@
     </Compile>
     <Compile Include="Helpers\DoubleToHoursConverter.cs" />
     <Compile Include="Helpers\TimeSpanToDateTimeConverter.cs" />
+    <Compile Include="Helpers\TimeSpanToStringConverter.cs" />
+    <Compile Include="Helpers\Watt.cs" />
     <Compile Include="Interfaces\ISettingsService.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

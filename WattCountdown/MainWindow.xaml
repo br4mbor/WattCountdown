@@ -10,6 +10,6 @@
         Loaded="Window_Loaded"
         Unloaded="Window_Unloaded">
     <DockPanel>
-        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Focusable="False"/>
     </DockPanel>
 </Window>

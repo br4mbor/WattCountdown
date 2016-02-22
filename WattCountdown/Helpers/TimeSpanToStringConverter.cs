@@ -8,11 +8,11 @@ using System.Windows.Data;
 
 namespace Abb.Cz.Apps.WattCountdown.Helpers
 {
-    [ValueConversion(typeof(double), typeof(string))]
-    class DoubleToHoursConverter : IValueConverter
+    [ValueConversion(typeof(TimeSpan), typeof(string))]
+    class TimeSpanToStringConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) 
-            => TimeSpan.FromHours((double)value).ToString(@"hh\:mm");
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => ((TimeSpan)value).ToString(@"hh\:mm\:ss");
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

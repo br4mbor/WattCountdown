@@ -17,7 +17,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         private CountdownModel countdownModel = new CountdownModel();
         private static DispatcherTimer timer = new DispatcherTimer();
         #endregion
-        
+
         #region Properties
         public TimeSpan StartTime
         {
@@ -34,45 +34,90 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         public double WorkTime
         {
             get { return countdownModel.WorkTime; }
-            set { countdownModel.WorkTime = value; }
+            set
+            {
+                countdownModel.WorkTime = value;
+                if (value >= 6 && !LunchVoucher)
+                    LunchVoucher = true;
+                else if (value < 6 && LunchVoucher)
+                    LunchVoucher = false;
+            }
+        }
+
+        public bool LunchVoucher
+        {
+            get { return countdownModel.LunchVoucher; }
+            private set
+            {
+                countdownModel.LunchVoucher = value;
+                RaisePropertyChanged(nameof(LunchVoucher));
+            }
         }
 
         public TimeSpan Countdown
         {
-            get; set;
+            get { return countdownModel.Countdown; }
+            private set
+            {
+                countdownModel.Countdown = value;
+                RaisePropertyChanged(nameof(Countdown));
+            }
         }
 
-        public TimeSpan TimeToGo => countdownModel.EndDate - DateTime.Now;
-
-        public string TimeToGoLabel => TimeToGo.ToString(@"hh\:mm\:ss");
-
         private bool startEnabled = true;
-        private bool lunchEnabled = true;
         private bool workTimeEnabled = true;
-        private System.Windows.Visibility timeToGoVisible = System.Windows.Visibility.Hidden;
+        private System.Windows.Visibility countdownVisible = System.Windows.Visibility.Hidden;
+        private bool startButtonEnabled = true;
+        private bool stopButtonEnabled = false;
 
         public bool StartEnabled
         {
             get { return startEnabled; }
-            private set { startEnabled = value; RaisePropertyChanged(nameof(StartEnabled)); }
-        }
-
-        public bool LunchEnabled
-        {
-            get { return lunchEnabled; }
-            private set { lunchEnabled = value; RaisePropertyChanged(nameof(LunchEnabled)); }
+            private set
+            {
+                startEnabled = value;
+                RaisePropertyChanged(nameof(StartEnabled));
+            }
         }
 
         public bool WorkTimeEnabled
         {
             get { return workTimeEnabled; }
-            private set { workTimeEnabled = value; RaisePropertyChanged(nameof(WorkTimeEnabled)); }
+            private set
+            {
+                workTimeEnabled = value;
+                RaisePropertyChanged(nameof(WorkTimeEnabled));
+            }
         }
 
-        public System.Windows.Visibility TimeToGoVisible
+        public System.Windows.Visibility CountdownVisible
         {
-            get { return timeToGoVisible; }
-            private set { timeToGoVisible = value; RaisePropertyChanged(nameof(TimeToGoVisible)); }
+            get { return countdownVisible; }
+            private set
+            {
+                countdownVisible = value;
+                RaisePropertyChanged(nameof(CountdownVisible));
+            }
+        }
+
+        public bool StartButtonEnabled
+        {
+            get { return startButtonEnabled; }
+            private set
+            {
+                startButtonEnabled = value;
+                RaisePropertyChanged(nameof(StartButtonEnabled));
+            }
+        }
+
+        public bool StopButtonEnabled
+        {
+            get { return stopButtonEnabled; }
+            private set
+            {
+                stopButtonEnabled = value;
+                RaisePropertyChanged(nameof(StopButtonEnabled));
+            }
         }
 
         #endregion
@@ -87,45 +132,47 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         {
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Tick += Timer_Tick;
-            
+
             StartCommand = new RelayCommand(Start);
             StopCommand = new RelayCommand(Stop);
         }
 
         private void Start()
         {
+            LockInterface();
             var now = DateTime.Now;
             countdownModel.EndDate = now.Date.Add(StartTime).Add(Lunch).AddHours(WorkTime);
             Countdown = countdownModel.EndDate - now;
-            LockInterface();
             timer.Start();
         }
 
         private void Stop()
         {
-            UnlockInterface();
             timer.Stop();
+            UnlockInterface();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            RaisePropertyChanged(nameof(TimeToGoLabel));
+            Countdown = Countdown.Subtract(timer.Interval);
         }
 
         private void LockInterface()
         {
             StartEnabled = false;
-            LunchEnabled = false;
             WorkTimeEnabled = false;
-            TimeToGoVisible = System.Windows.Visibility.Visible;
+            CountdownVisible = System.Windows.Visibility.Visible;
+            StartButtonEnabled = false;
+            StopButtonEnabled = true;
         }
 
         private void UnlockInterface()
         {
             StartEnabled = true;
-            LunchEnabled = true;
             WorkTimeEnabled = true;
-            TimeToGoVisible = System.Windows.Visibility.Hidden;
+            CountdownVisible = System.Windows.Visibility.Hidden;
+            StartButtonEnabled = true;
+            StopButtonEnabled = false;
         }
     }
 }

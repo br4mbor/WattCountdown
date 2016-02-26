@@ -35,6 +35,9 @@ namespace Abb.Cz.Apps.WattCountdown
             SimpleIoc.Default.Register(() => MainFrame.NavigationService);
             //SimpleIoc.Default.GetInstance<NavigationService>().Navigate(new LoginView());
             SimpleIoc.Default.GetInstance<NavigationService>().Navigate(new CountdownView());
+
+            //var watt = new Helpers.Watt("1288500", "1288500");
+            //var ui = watt.GetUserInformation();
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)

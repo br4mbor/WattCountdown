@@ -19,8 +19,8 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition Height="100"/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <!--<RowDefinition/>
+            <RowDefinition/>-->
             <RowDefinition/>
         </Grid.RowDefinitions>
         <GroupBox Header="Time settings" Margin="10" Grid.Row="0">
@@ -43,7 +43,7 @@
                    Visibility="{Binding CountdownVisible}"
                    Content="{Binding Countdown, Mode=OneWay, Converter={StaticResource TimeSpanToStringConverter}}"/>
         </GroupBox>
-        <GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3">
+        <!--<GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3">
             <StackPanel Orientation="Horizontal">
                 <CheckBox IsChecked="{Binding LunchVoucher}" IsEnabled="False" Margin="10" Content="Lunch voucher"/>
             </StackPanel>
@@ -51,9 +51,9 @@
         <GroupBox Header="Application settings" Margin="10" Grid.Row="4">
             <StackPanel Orientation="Horizontal">
                 <CheckBox Margin="10" Content="Display clock"/>
-                <!--<ext:ColorPicker Margin="10" Width="100"/>-->
+                --><!--<ext:ColorPicker Margin="10" Width="100"/>--><!--
             </StackPanel>
-        </GroupBox>
+        </GroupBox>-->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="5">
             <Button IsEnabled="{Binding StartButtonEnabled}" IsDefault="True" Margin="0,0,10,10" Width="60" Content="Start" Command="{Binding StartCommand}"/>
             <Button IsEnabled="{Binding StopButtonEnabled}" IsCancel="True" Margin="0,0,10,10" Width="60" Content="Stop" Command="{Binding StopCommand}"/>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -9,87 +10,91 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
 {
     class Watt
     {
-        //private CookieContainer CookieJar = new CookieContainer();
-        //private string userName;
-        //private string password;
+        private const string WattBaseUrl = "http://czbrq-s-apl0007:8080/reports/";
+        private const string WattLoginUrl = WattBaseUrl + "dologin.jsp";
+        private const string WattReportUrl = WattBaseUrl + "report_fetcher.jsp?taskId";
 
-        //Watt(string userName, string password)
-        //{
-        //    this.userName = userName;
-        //    this.password = password;
-        //}
+        private CookieContainer cookieJar = new CookieContainer();
+        private string userName;
+        private string password;
 
-        //public UserInformation getUserInformation()
-        //{
-        //    try
-        //    {
-        //        HttpWebResponse requestData = this.getRequestData(new Uri("http://czbrq-s-apl0007:8080/reports/dologin.jsp"), "POST", this.proxyUserName, this.proxyPassword, this.proxyAddress, this.proxyPort, "app=&username=" + this.watUserName + "&password=" + this.watPassword);
-        //        string str = requestData.ResponseUri.ToString();
-        //        if (requestData != null)
-        //            requestData.Close();
-        //        return new UserInformation(this.getRawStringFromResponse(this.getRequestData(new Uri("http://czbrq-s-apl0007:8080/reports/report_fetcher.jsp?taskId" + str.Substring(str.IndexOf("=-")) + "&repId=1"), "GET", this.proxyUserName, this.proxyPassword, this.proxyAddress, this.proxyPort, "")));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new UserInformation();
-        //    }
-        //}
+        internal Watt(string userName, string password)
+        {
+            this.userName = userName;
+            this.password = password;
+        }
 
-        //private string getRawStringFromResponse(HttpWebResponse httpWebResponse)
-        //{
-        //    StreamReader streamReader = new StreamReader(httpWebResponse.GetResponseStream(), Encoding.ASCII);
-        //    string str = streamReader.ReadToEnd();
-        //    streamReader.Close();
-        //    if (httpWebResponse != null)
-        //    {
-        //        httpWebResponse.Close();
-        //        httpWebResponse = (HttpWebResponse)null;
-        //    }
-        //    return str;
-        //}
+        public UserInformation GetUserInformation()
+        {
+            try
+            {
+                var response = GetResponseFromWattRequest(new Uri(WattLoginUrl), RequestMethod.POST, string.Format("app=&username={0}&password={1}", userName, password));
 
-        //private HttpWebResponse getRequestData(Uri URL, string Method, string proxyUserName, string proxyPassword, string proxyAddress, string proxyPort, string postData)
-        //{
-        //    try
-        //    {
-        //        if (proxyAddress.Length > 0)
-        //            GlobalProxySelection.Select = (IWebProxy)new WebProxy(proxyAddress + ":" + proxyPort, true);
-        //        HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(URL);
-        //        if (proxyUserName.Length > 0)
-        //        {
-        //            NetworkCredential networkCredential = new NetworkCredential(proxyUserName, proxyPassword);
-        //            httpWebRequest.Credentials = (ICredentials)new CredentialCache()
-        //  {
-        //    {
-        //      URL,
-        //      "Basic",
-        //      networkCredential
-        //    }
-        //  };
-        //        }
-        //        else
-        //            httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
-        //        httpWebRequest.CookieContainer = this.CookieJar;
-        //        httpWebRequest.UserAgent = "CSharp HTTP Sample";
-        //        httpWebRequest.KeepAlive = true;
-        //        httpWebRequest.Headers.Set("Pragma", "no-cache");
-        //        httpWebRequest.Timeout = 300000;
-        //        httpWebRequest.Method = Method;
-        //        if ("POST" == Method)
-        //        {
-        //            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-        //            byte[] bytes = Encoding.ASCII.GetBytes(postData);
-        //            httpWebRequest.ContentLength = (long)bytes.Length;
-        //            Stream requestStream = httpWebRequest.GetRequestStream();
-        //            requestStream.Write(bytes, 0, bytes.Length);
-        //            requestStream.Close();
-        //        }
-        //        return (HttpWebResponse)httpWebRequest.GetResponse();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return (HttpWebResponse)null;
-        //    }
-        //}
-    }
+                string responseUrl = response.ResponseUri.ToString();
+
+                if (response != null)
+                    response.Close();
+
+                if (responseUrl.Equals(WattLoginUrl))
+                    return null;
+
+                return new UserInformation(GetRawStringFromResponse(GetResponseFromWattRequest(new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=1"), RequestMethod.GET)));
+
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private string GetRawStringFromResponse(HttpWebResponse response)
+        {
+            using (var sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                var responseString = sr.ReadToEnd();
+                if (response != null)
+                {
+                    response.Close();
+                    response = null;
+                }
+                return responseString;
+            }
+        }
+
+        private HttpWebResponse GetResponseFromWattRequest(Uri requestUrl, RequestMethod method, string postData = "")
+        {
+            try
+            {
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(requestUrl);
+
+                httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
+                httpWebRequest.CookieContainer = cookieJar;
+                httpWebRequest.UserAgent = "CSharp HTTP Sample";
+                httpWebRequest.KeepAlive = true;
+                httpWebRequest.Headers.Set("Pragma", "no-cache");
+                httpWebRequest.Timeout = 300000;
+                httpWebRequest.Method = method.ToString();
+                if (method == RequestMethod.POST)
+                {
+                    httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                    byte[] bytes = Encoding.ASCII.GetBytes(postData);
+                    httpWebRequest.ContentLength = bytes.Length;
+                    Stream requestStream = httpWebRequest.GetRequestStream();
+                    requestStream.Write(bytes, 0, bytes.Length);
+                    requestStream.Close();
+                }
+                return (HttpWebResponse)httpWebRequest.GetResponse();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private enum RequestMethod
+        {
+            POST,
+            GET
+        }
+    }   
 }

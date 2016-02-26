@@ -37,10 +37,10 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             set
             {
                 countdownModel.WorkTime = value;
-                if (value >= 6 && !LunchVoucher)
-                    LunchVoucher = true;
-                else if (value < 6 && LunchVoucher)
-                    LunchVoucher = false;
+                //if (value >= 6 && !LunchVoucher)
+                //    LunchVoucher = true;
+                //else if (value < 6 && LunchVoucher)
+                //    LunchVoucher = false;
             }
         }
 

@@ -14,31 +14,29 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
         private const string WattLoginUrl = WattBaseUrl + "dologin.jsp";
         private const string WattReportUrl = WattBaseUrl + "report_fetcher.jsp?taskId";
 
-        private CookieContainer cookieJar = new CookieContainer();
-        private string userName;
-        private string password;
+        private readonly CookieContainer _cookieJar = new CookieContainer();
+        private readonly string _userName;
+        private readonly string _password;
 
         internal Watt(string userName, string password)
         {
-            this.userName = userName;
-            this.password = password;
+            _userName = userName;
+            _password = password;
         }
 
         public UserInformation GetUserInformation()
         {
             try
             {
-                var response = GetResponseFromWattRequest(new Uri(WattLoginUrl), RequestMethod.POST, string.Format("app=&username={0}&password={1}", userName, password));
+                var response = GetResponseFromWattRequest(new Uri(WattLoginUrl), RequestMethod.Post, $"app=&username={_userName}&password={_password}");
+                var responseUrl = response.ResponseUri.ToString();
 
-                string responseUrl = response.ResponseUri.ToString();
-
-                if (response != null)
-                    response.Close();
+                response.Close();
 
                 if (responseUrl.Equals(WattLoginUrl))
                     return null;
 
-                return new UserInformation(GetRawStringFromResponse(GetResponseFromWattRequest(new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=1"), RequestMethod.GET)));
+                return new UserInformation(GetRawStringFromResponse(GetResponseFromWattRequest(new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=1"), RequestMethod.Get)));
 
             }
             catch
@@ -52,11 +50,8 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
             using (var sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
             {
                 var responseString = sr.ReadToEnd();
-                if (response != null)
-                {
-                    response.Close();
-                    response = null;
-                }
+                response.Close();
+                
                 return responseString;
             }
         }
@@ -68,13 +63,13 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(requestUrl);
 
                 httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
-                httpWebRequest.CookieContainer = cookieJar;
+                httpWebRequest.CookieContainer = _cookieJar;
                 httpWebRequest.UserAgent = "CSharp HTTP Sample";
                 httpWebRequest.KeepAlive = true;
                 httpWebRequest.Headers.Set("Pragma", "no-cache");
                 httpWebRequest.Timeout = 300000;
                 httpWebRequest.Method = method.ToString();
-                if (method == RequestMethod.POST)
+                if (method == RequestMethod.Post)
                 {
                     httpWebRequest.ContentType = "application/x-www-form-urlencoded";
                     byte[] bytes = Encoding.ASCII.GetBytes(postData);
@@ -93,8 +88,8 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
 
         private enum RequestMethod
         {
-            POST,
-            GET
+            Post,
+            Get
         }
     }   
 }

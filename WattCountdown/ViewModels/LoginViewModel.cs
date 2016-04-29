@@ -17,20 +17,20 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
     public class LoginViewModel : ViewModelBase
     {
         #region Fields
-        private LoginModel loginModel = new LoginModel();
+        private LoginModel _loginModel = new LoginModel();
         #endregion
 
         #region Properties
         public string UserName
         {
-            get { return loginModel.UserName; }
-            set { loginModel.UserName = value; }
+            get { return _loginModel.UserName; }
+            set { _loginModel.UserName = value; }
         }
 
         public string Password
         {
-            get { return loginModel.Password; }
-            set { loginModel.Password = value; }
+            get { return _loginModel.Password; }
+            set { _loginModel.Password = value; }
         }
         #endregion
 

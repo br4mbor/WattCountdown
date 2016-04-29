@@ -26,7 +26,7 @@
         <GroupBox Header="Time settings" Margin="10" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Start:" VerticalAlignment="Center"/>
-                <ext:TimePicker IsEnabled="{Binding StartEnabled}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding StartTime, Converter={StaticResource TimeSpanToDateTimeConverter}}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding StartEnabled}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Start}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="Lunch:" VerticalAlignment="Center"/>
                 <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch, Converter={StaticResource TimeSpanToDateTimeConverter}}" Format="Custom" FormatString="HH:mm"/>
                 <!--<Label Content="End:" VerticalAlignment="Center"/>
@@ -41,7 +41,7 @@
                    FontSize="38"
                    FontWeight="DemiBold"
                    Visibility="{Binding CountdownVisible}"
-                   Content="{Binding Countdown, Mode=OneWay, Converter={StaticResource TimeSpanToStringConverter}}"/>
+                   Content="{Binding CountdownLabel, Mode=OneWay}"/>
         </GroupBox>
         <!--<GroupBox Header="Restrictions and benefits" Margin="10" Grid.Row="3">
             <StackPanel Orientation="Horizontal">

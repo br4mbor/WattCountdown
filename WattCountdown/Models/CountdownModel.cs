@@ -8,12 +8,12 @@ namespace Abb.Cz.Apps.WattCountdown.Models
 {
     public class CountdownModel
     {
-        private TimeSpan startTime;
+        private DateTime start;
 
-        public TimeSpan StartTime
+        public DateTime Start
         {
-            get { return startTime; }
-            set { startTime = value.Subtract(new TimeSpan(0, 0, 0, value.Seconds, value.Milliseconds)); }
+            get { return start; }
+            set { start = value.Subtract(new TimeSpan(0, 0, 0, value.Second, value.Millisecond)); }
         }
 
         public TimeSpan Lunch { get; set; }
@@ -33,8 +33,7 @@ namespace Abb.Cz.Apps.WattCountdown.Models
 
         private void SetDefaultData()
         {
-            var now = DateTime.Now;
-            StartTime = now.TimeOfDay;
+            Start = DateTime.Now;
             WorkTime = 8;
             Lunch = new TimeSpan(0, 30, 0);
             LunchVoucher = true;

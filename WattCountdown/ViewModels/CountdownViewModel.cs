@@ -19,10 +19,10 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         #endregion
 
         #region Properties
-        public TimeSpan StartTime
+        public DateTime Start
         {
-            get { return countdownModel.StartTime; }
-            set { countdownModel.StartTime = value; }
+            get { return countdownModel.Start; }
+            set { countdownModel.Start = value; }
         }
 
         public TimeSpan Lunch
@@ -64,58 +64,69 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             }
         }
 
-        private bool startEnabled = true;
-        private bool workTimeEnabled = true;
-        private System.Windows.Visibility countdownVisible = System.Windows.Visibility.Hidden;
-        private bool startButtonEnabled = true;
-        private bool stopButtonEnabled = false;
+        public string CountdownLabel
+        {
+            get { return _countdownLabel; }
+            set
+            {
+                _countdownLabel = value;
+                RaisePropertyChanged(nameof(CountdownLabel));
+            }
+        }
+
+        private bool _startEnabled = true;
+        private bool _workTimeEnabled = true;
+        private System.Windows.Visibility _countdownVisible = System.Windows.Visibility.Hidden;
+        private bool _startButtonEnabled = true;
+        private bool _stopButtonEnabled = false;
+        private string _countdownLabel;
 
         public bool StartEnabled
         {
-            get { return startEnabled; }
+            get { return _startEnabled; }
             private set
             {
-                startEnabled = value;
+                _startEnabled = value;
                 RaisePropertyChanged(nameof(StartEnabled));
             }
         }
 
         public bool WorkTimeEnabled
         {
-            get { return workTimeEnabled; }
+            get { return _workTimeEnabled; }
             private set
             {
-                workTimeEnabled = value;
+                _workTimeEnabled = value;
                 RaisePropertyChanged(nameof(WorkTimeEnabled));
             }
         }
 
         public System.Windows.Visibility CountdownVisible
         {
-            get { return countdownVisible; }
+            get { return _countdownVisible; }
             private set
             {
-                countdownVisible = value;
+                _countdownVisible = value;
                 RaisePropertyChanged(nameof(CountdownVisible));
             }
         }
 
         public bool StartButtonEnabled
         {
-            get { return startButtonEnabled; }
+            get { return _startButtonEnabled; }
             private set
             {
-                startButtonEnabled = value;
+                _startButtonEnabled = value;
                 RaisePropertyChanged(nameof(StartButtonEnabled));
             }
         }
 
         public bool StopButtonEnabled
         {
-            get { return stopButtonEnabled; }
+            get { return _stopButtonEnabled; }
             private set
             {
-                stopButtonEnabled = value;
+                _stopButtonEnabled = value;
                 RaisePropertyChanged(nameof(StopButtonEnabled));
             }
         }
@@ -133,20 +144,20 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             timer.Interval = new TimeSpan(0, 0, 1);
             timer.Tick += Timer_Tick;
 
-            StartCommand = new RelayCommand(Start);
-            StopCommand = new RelayCommand(Stop);
+            StartCommand = new RelayCommand(StartCountdown);
+            StopCommand = new RelayCommand(StopCountdown);
         }
 
-        private void Start()
+        private void StartCountdown()
         {
             LockInterface();
             var now = DateTime.Now;
-            countdownModel.EndDate = now.Date.Add(StartTime).Add(Lunch).AddHours(WorkTime);
+            countdownModel.EndDate = now.Date.Add(Start.TimeOfDay).Add(Lunch).AddHours(WorkTime);
             Countdown = countdownModel.EndDate - now;
             timer.Start();
         }
 
-        private void Stop()
+        private void StopCountdown()
         {
             timer.Stop();
             UnlockInterface();
@@ -155,6 +166,16 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         private void Timer_Tick(object sender, EventArgs e)
         {
             Countdown = Countdown.Subtract(timer.Interval);
+
+            if (Countdown.TotalSeconds < 0)
+            {
+                timer.Stop();
+                CountdownLabel = Properties.Resources.CountdownFinished;
+            }
+            else
+            {
+                CountdownLabel = Countdown.ToString(@"hh\:mm\:ss");
+            }
         }
 
         private void LockInterface()

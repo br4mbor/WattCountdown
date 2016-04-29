@@ -7,7 +7,7 @@ using HtmlAgilityPack;
 
 namespace Abb.Cz.Apps.WattCountdown.Helpers
 {
-    class UserInformation
+    internal class UserInformation
     {
         public string Name { get; set; }
 
@@ -30,7 +30,7 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
             CreateUserInfromationFromWattHtml(wattHtml);
         }
 
-        private void CreateUserInfromationFromWattHtml(string wattHtml)
+        private static void CreateUserInfromationFromWattHtml(string wattHtml)
         {
             var html = new HtmlDocument();
             html.LoadHtml(wattHtml);
@@ -65,12 +65,12 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
             //}
         }
 
-        private TimeSpan GetStartTime(List<WattTime> watTimes)
+        private TimeSpan GetStartTime(IEnumerable<WattTime> watTimes)
         {
             this.MissingStartDate = true;
-            foreach (WattTime watTime in watTimes)
+            foreach (var watTime in watTimes)
             {
-                bool? nullable = watTime.enter;
+                var nullable = watTime.enter;
                 if ((!nullable.GetValueOrDefault() ? 0 : (nullable.HasValue ? 1 : 0)) != 0)
                     return watTime.time;
             }

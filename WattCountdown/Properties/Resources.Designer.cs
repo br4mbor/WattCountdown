@@ -59,5 +59,14 @@ namespace Abb.Cz.Apps.WattCountdown.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go home!!!.
+        /// </summary>
+        internal static string CountdownFinished {
+            get {
+                return ResourceManager.GetString("CountdownFinished", resourceCulture);
+            }
+        }
     }
 }

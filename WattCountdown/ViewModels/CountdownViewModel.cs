@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Abb.Cz.Apps.WattCountdown.Services;
 
 namespace Abb.Cz.Apps.WattCountdown.ViewModels
 {
@@ -155,6 +156,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             countdownModel.EndDate = now.Date.Add(Start.TimeOfDay).Add(Lunch).AddHours(WorkTime);
             Countdown = countdownModel.EndDate - now;
             timer.Start();
+            new WattParser().Parse();
         }
 
         private void StopCountdown()

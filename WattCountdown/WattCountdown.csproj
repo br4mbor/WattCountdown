@@ -117,6 +117,7 @@
     </Compile>
     <Compile Include="Models\CountdownModel.cs" />
     <Compile Include="Services\LocalSettingsService.cs" />
+    <Compile Include="Services\WattParser.cs" />
     <Compile Include="ViewModels\CountdownViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />

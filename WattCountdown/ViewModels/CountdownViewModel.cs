@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,19 +18,52 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         #region Fields
         private CountdownModel countdownModel = new CountdownModel();
         private static DispatcherTimer timer = new DispatcherTimer();
+        private TimeSpan HalfHour = TimeSpan.FromMinutes(30);
         #endregion
 
         #region Properties
+
+        private DateTime _selectedDate;
+        public DateTime SelectedDate {
+            get { return _selectedDate; }
+            set
+            {
+                _selectedDate = value;
+                RaisePropertyChanged(nameof(SelectedDate));
+            }
+    }
+
         public DateTime Start
         {
             get { return countdownModel.Start; }
-            set { countdownModel.Start = value; }
+            set
+            {
+                countdownModel.Start = value; 
+                RaisePropertyChanged(nameof(Start));
+
+            }
+        }
+
+        public DateTime EndTime
+        {
+            get { return countdownModel.EndDate; }
+            set
+            {
+                countdownModel.EndDate = value; 
+                RaisePropertyChanged(nameof(EndTime));
+
+            }
         }
 
         public TimeSpan Lunch
         {
             get { return countdownModel.Lunch; }
-            set { countdownModel.Lunch = value; }
+            set
+            {
+                countdownModel.Lunch = value; 
+                RaisePropertyChanged(nameof(Lunch));
+
+            }
         }
 
         public double WorkTime
@@ -38,10 +72,19 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             set
             {
                 countdownModel.WorkTime = value;
+                RaisePropertyChanged(nameof(WorkTime));
                 //if (value >= 6 && !LunchVoucher)
                 //    LunchVoucher = true;
                 //else if (value < 6 && LunchVoucher)
                 //    LunchVoucher = false;
+            }
+        }
+
+        public TimeSpan WorkTimeSpan
+        {
+            get
+            {
+                return TimeSpan.FromHours(WorkTime);
             }
         }
 
@@ -147,16 +190,71 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
             StartCommand = new RelayCommand(StartCountdown);
             StopCommand = new RelayCommand(StopCountdown);
+
+            SelectedDate = DateTime.Now;
         }
 
         private void StartCountdown()
         {
             LockInterface();
-            var now = DateTime.Now;
-            countdownModel.EndDate = now.Date.Add(Start.TimeOfDay).Add(Lunch).AddHours(WorkTime);
-            Countdown = countdownModel.EndDate - now;
-            timer.Start();
-            new WattParser().Parse();
+
+
+            ClearForm();
+            PrepareData();
+        }
+
+        private void ClearForm()
+        {
+            Start = DateTime.Today;
+            EndTime = DateTime.Today;
+            Lunch = TimeSpan.FromMinutes(30);
+        }
+
+        private void PrepareData()
+        {
+            var parser = new WattParser(File.ReadAllText("D:\\WATT.htm"));
+            var entries = parser.ParseEntries(SelectedDate);
+            if (entries.First().Type != EntryType.Prichod)
+                throw new Exception("First entry is not of type 'Prichod'");
+            Start = entries.First().EntryTime;
+            Lunch = GetTimeToSubtract(entries);
+            EndTime = entries.Last().EntryTime;
+            var timeToLeave = Start + WorkTimeSpan + Lunch;
+            
+            if (entries.Count > 3 && entries.Count % 2 == 0 && entries.Last().Type == EntryType.Odchod)
+            {
+                Countdown = timeToLeave - EndTime;
+                timer.Stop();
+                
+            }
+            else
+            {
+                Countdown = timeToLeave - DateTime.Now;
+                timer.Start();
+            }
+
+            SetCountdownLabel();
+        }
+
+        private TimeSpan GetTimeToSubtract(List<WattEntry> entries)
+        {
+            TimeSpan sumToSubtract = new TimeSpan();
+            for (int i = 1; i < entries.Count-1; i+=2)
+            {
+                var startEntry = entries[i];
+                var endEntry = entries[i+1];
+
+                if(startEntry.Type == EntryType.Prichod || endEntry.Type == EntryType.Odchod)
+                    throw new NotSupportedException("Your WATT report is not correct");
+
+                var toSubtract = endEntry.EntryTime - startEntry.EntryTime;
+                sumToSubtract += toSubtract;
+            }
+
+            if (sumToSubtract < HalfHour)
+                sumToSubtract = HalfHour;
+
+            return sumToSubtract;
         }
 
         private void StopCountdown()
@@ -169,15 +267,19 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         {
             Countdown = Countdown.Subtract(timer.Interval);
 
-            if (Countdown.TotalSeconds < 0)
-            {
-                timer.Stop();
-                CountdownLabel = Properties.Resources.CountdownFinished;
-            }
-            else
-            {
-                CountdownLabel = Countdown.ToString(@"hh\:mm\:ss");
-            }
+            //if (Countdown.TotalSeconds < 0)
+            //{
+            //    timer.Stop();
+            //    CountdownLabel = Properties.Resources.CountdownFinished;
+            //}
+            //else
+            SetCountdownLabel();
+        }
+
+
+        private void SetCountdownLabel()
+        {
+            CountdownLabel = (Countdown < TimeSpan.Zero ? "-" : "+") +  Countdown.ToString(@"hh\:mm\:ss");
         }
 
         private void LockInterface()

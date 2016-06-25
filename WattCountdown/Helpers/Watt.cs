@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Abb.Cz.Apps.WattCountdown.Helpers
 {
@@ -37,6 +34,8 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
         private string LoginAndGetResponseUrl()
         {
             var response = GetResponseFromWattRequest(new Uri(WattLoginUrl), RequestMethod.Post, $"app=&username={_userName}&password={_password}");
+            if (response == null)
+                throw new Exception("Unable to pass the login process.");
             var responseUrl = response.ResponseUri.ToString();
 
             response.Close();
@@ -68,11 +67,14 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
 
         private string GetRawStringFromResponse(HttpWebResponse response)
         {
+            if (response == null)
+                throw new Exception("Unable to get report html.");
+
             using (var sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
             {
                 var responseString = sr.ReadToEnd();
                 response.Close();
-                
+
                 return responseString;
             }
         }
@@ -112,5 +114,5 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
             Post,
             Get
         }
-    }   
+    }
 }

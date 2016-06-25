@@ -45,7 +45,7 @@
         </GroupBox>
         <GroupBox Header="Time to go" Margin="10" Grid.Row="3">
             <StackPanel Orientation="Vertical">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" FontSize="20" Visibility="{Binding CountdownVisible}" Content="{Binding TimeToLeave, Mode=OneWay}"/>
+                <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" FontSize="20" Visibility="{Binding CountdownVisible}" Content="{Binding TimeToLeaveLabel, Mode=OneWay}"/>
                 <Label HorizontalAlignment="Center" VerticalAlignment="Center"
                    FontSize="38"
                    FontWeight="DemiBold"

@@ -1,18 +1,15 @@
-﻿using Abb.Cz.Apps.WattCountdown.Models;
+﻿using Abb.Cz.Apps.WattCountdown.Helpers;
+using Abb.Cz.Apps.WattCountdown.Interfaces;
+using Abb.Cz.Apps.WattCountdown.Models;
+using Abb.Cz.Apps.WattCountdown.Services;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Ioc;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Abb.Cz.Apps.WattCountdown.Helpers;
-using Abb.Cz.Apps.WattCountdown.Interfaces;
-using Abb.Cz.Apps.WattCountdown.Services;
-using GalaSoft.MvvmLight.Ioc;
 
 namespace Abb.Cz.Apps.WattCountdown.ViewModels
 {
@@ -27,21 +24,22 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         #region Properties
 
         private DateTime _selectedDate;
-        public DateTime SelectedDate {
+        public DateTime SelectedDate
+        {
             get { return _selectedDate; }
             set
             {
                 _selectedDate = value;
                 RaisePropertyChanged(nameof(SelectedDate));
             }
-    }
+        }
 
         public DateTime Start
         {
             get { return countdownModel.Start; }
             set
             {
-                countdownModel.Start = value; 
+                countdownModel.Start = value;
                 RaisePropertyChanged(nameof(Start));
 
             }
@@ -52,9 +50,37 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             get { return countdownModel.EndDate; }
             set
             {
-                countdownModel.EndDate = value; 
+                countdownModel.EndDate = value;
                 RaisePropertyChanged(nameof(EndTime));
 
+            }
+        }
+
+        private string _timeToLeaveLabel;
+        public string TimeToLeaveLabel
+        {
+            get
+            {
+                return _timeToLeaveLabel;
+            }
+            set
+            {
+                _timeToLeaveLabel = value;
+                RaisePropertyChanged(nameof(TimeToLeaveLabel));
+            }
+        }
+
+        private DateTime _timeToLeave;
+        public DateTime TimeToLeave
+        {
+            get
+            {
+                return _timeToLeave;
+            }
+            set
+            {
+                _timeToLeave = value;
+                RaisePropertyChanged(nameof(TimeToLeave));
             }
         }
 
@@ -63,7 +89,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             get { return countdownModel.Lunch; }
             set
             {
-                countdownModel.Lunch = value; 
+                countdownModel.Lunch = value;
                 RaisePropertyChanged(nameof(Lunch));
 
             }
@@ -121,6 +147,8 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             }
         }
 
+        private string _errorMessage;
+
         private bool _startEnabled = true;
         private bool _workTimeEnabled = true;
         private System.Windows.Visibility _countdownVisible = System.Windows.Visibility.Hidden;
@@ -158,6 +186,17 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             }
         }
 
+        private System.Windows.Visibility _errorVisible;
+        public System.Windows.Visibility ErrorVisible
+        {
+            get { return _errorVisible; }
+            private set
+            {
+                _errorVisible = value;
+                RaisePropertyChanged(nameof(ErrorVisible));
+            }
+        }
+
         public bool StartButtonEnabled
         {
             get { return _startButtonEnabled; }
@@ -184,6 +223,20 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
         public ICommand StartCommand { get; private set; }
 
         public ICommand StopCommand { get; private set; }
+
+        public string ErrorMessage
+        {
+            get
+            {
+                return _errorMessage;
+            }
+
+            set
+            {
+                _errorMessage = value;
+                RaisePropertyChanged(nameof(ErrorMessage));
+            }
+        }
         #endregion
 
         public CountdownViewModel()
@@ -203,7 +256,14 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
 
             ClearForm();
-            PrepareData();
+            try
+            {
+                PrepareData();
+            }
+            catch (Exception ex)
+            {
+                SetError(ex.Message);
+            }
         }
 
         private void ClearForm()
@@ -211,47 +271,54 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             Start = DateTime.Today;
             EndTime = DateTime.Today;
             Lunch = TimeSpan.FromMinutes(30);
+            TimeToLeaveLabel = "";
+            TimeToLeave = DateTime.Today;
+
+            ErrorMessage = "";
         }
 
         private void PrepareData()
         {
-            //var settingsService = SimpleIoc.Default.GetInstance<ISettingsService>();
-            //var getter = new Watt(settingsService.UserName, settingsService.Password);
-            //var reportHtml = getter.LoginAndGetReportHtml();
-            var reportHtml = File.ReadAllText("D:\\WATT2.htm");
+            var settingsService = SimpleIoc.Default.GetInstance<ISettingsService>();
+            var getter = new Watt(settingsService.UserName, settingsService.Password);
+            var reportHtml = getter.LoginAndGetReportHtml();
+            //var parser = new WattParser(File.ReadAllText("D:\\WATT.htm"));
             var parser = new WattParser(reportHtml);
             var entries = parser.ParseEntries(SelectedDate);
             if (entries.First().Type != EntryType.Prichod)
                 throw new Exception("First entry is not of type 'Prichod'");
             Start = entries.First().EntryTime;
             Lunch = GetTimeToSubtract(entries);
-            EndTime = entries.Last().EntryTime;
-            var timeToLeave = Start + WorkTimeSpan + Lunch;
-            
+
+            if (entries.Last().Type == EntryType.Odchod)
+                EndTime = entries.Last().EntryTime;
+
+            TimeToLeave = Start + WorkTimeSpan + Lunch;
+
             if (entries.Count > 3 && entries.Count % 2 == 0 && entries.Last().Type == EntryType.Odchod)
             {
-                Countdown = timeToLeave - EndTime;
+                Countdown = TimeToLeave - EndTime;
                 timer.Stop();
-                
+
             }
             else
             {
-                Countdown = timeToLeave - DateTime.Now;
+                Countdown = TimeToLeave - DateTime.Now;
                 timer.Start();
             }
 
-            SetCountdownLabel();
+            SetLabels();
         }
 
         private TimeSpan GetTimeToSubtract(List<WattEntry> entries)
         {
             TimeSpan sumToSubtract = new TimeSpan();
-            for (int i = 1; i < entries.Count-1; i+=2)
+            for (int i = 1; i < entries.Count - 1; i += 2)
             {
                 var startEntry = entries[i];
-                var endEntry = entries[i+1];
+                var endEntry = entries[i + 1];
 
-                if(startEntry.Type == EntryType.Prichod || endEntry.Type == EntryType.Odchod)
+                if (startEntry.Type == EntryType.Prichod || endEntry.Type == EntryType.Odchod)
                     throw new NotSupportedException("Your WATT report is not correct");
 
                 var toSubtract = endEntry.EntryTime - startEntry.EntryTime;
@@ -280,20 +347,31 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             //    CountdownLabel = Properties.Resources.CountdownFinished;
             //}
             //else
-            SetCountdownLabel();
+            SetLabels();
         }
 
 
-        private void SetCountdownLabel()
+        private void SetLabels()
         {
-            CountdownLabel = (Countdown < TimeSpan.Zero ? "-" : "+") +  Countdown.ToString(@"hh\:mm\:ss");
+            CountdownLabel = (Countdown < TimeSpan.Zero ? "(over)" : "(missing)") + Countdown.ToString(@"hh\:mm\:ss");
+            TimeToLeaveLabel = TimeToLeave.ToShortTimeString();
+        }
+
+        private void SetError(string error)
+        {
+            ErrorMessage = error;
         }
 
         private void LockInterface()
         {
             StartEnabled = false;
             WorkTimeEnabled = false;
-            CountdownVisible = System.Windows.Visibility.Visible;
+
+            if (string.IsNullOrEmpty(ErrorMessage))
+                CountdownVisible = System.Windows.Visibility.Visible;
+            else
+                ErrorVisible = System.Windows.Visibility.Visible;
+
             StartButtonEnabled = false;
             StopButtonEnabled = true;
         }
@@ -303,8 +381,10 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             StartEnabled = true;
             WorkTimeEnabled = true;
             CountdownVisible = System.Windows.Visibility.Hidden;
+            ErrorVisible = System.Windows.Visibility.Hidden;
             StartButtonEnabled = true;
             StopButtonEnabled = false;
+
         }
     }
 }

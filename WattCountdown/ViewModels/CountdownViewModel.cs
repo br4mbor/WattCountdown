@@ -217,12 +217,19 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             }
         }
 
+        public bool AutoModeEnabled { get; set; }
+        public bool ManualModeEnabled { get; set; }
+
         #endregion
 
         #region Commands
         public ICommand StartCommand { get; private set; }
 
         public ICommand StopCommand { get; private set; }
+
+        public ICommand DateChangedCommand { get; private set; }
+
+        public ICommand TodayCommand { get; private set; }
 
         public string ErrorMessage
         {
@@ -246,15 +253,31 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
             StartCommand = new RelayCommand(StartCountdown);
             StopCommand = new RelayCommand(StopCountdown);
+            DateChangedCommand = new RelayCommand(DateChanged);
+            TodayCommand = new RelayCommand(ChangeToToday);
 
             SelectedDate = DateTime.Now;
+
+            //StartCountdown();
         }
 
-        private void StartCountdown()
+        private void ChangeToToday()
         {
-            LockInterface();
+            SelectedDate = DateTime.Today;
+            DateChanged();
+        }
 
+        private void DateChanged()
+        {
+            if (!AutoModeEnabled)
+                return;
 
+            StopCountdown();
+            StartCountdown();
+        }
+
+    private void StartCountdown()
+        {
             ClearForm();
             try
             {
@@ -264,6 +287,9 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             {
                 SetError(ex.Message);
             }
+
+            SetLabels();
+            LockInterface();
         }
 
         private void ClearForm()
@@ -271,9 +297,9 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             Start = DateTime.Today;
             EndTime = DateTime.Today;
             Lunch = TimeSpan.FromMinutes(30);
-            TimeToLeaveLabel = "";
             TimeToLeave = DateTime.Today;
-
+            TimeToLeaveLabel = "";
+            CountdownLabel = "";
             ErrorMessage = "";
         }
 
@@ -285,6 +311,8 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
             //var parser = new WattParser(File.ReadAllText("D:\\WATT.htm"));
             var parser = new WattParser(reportHtml);
             var entries = parser.ParseEntries(SelectedDate);
+            if (!entries.Any())
+                throw new Exception("There are no entries for selected date.");
             if (entries.First().Type != EntryType.Prichod)
                 throw new Exception("First entry is not of type 'Prichod'");
             Start = entries.First().EntryTime;
@@ -307,7 +335,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
                 timer.Start();
             }
 
-            SetLabels();
+            
         }
 
         private TimeSpan GetTimeToSubtract(List<WattEntry> entries)
@@ -353,7 +381,7 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
         private void SetLabels()
         {
-            CountdownLabel = (Countdown < TimeSpan.Zero ? "(over)" : "(missing)") + Countdown.ToString(@"hh\:mm\:ss");
+            CountdownLabel = (Countdown < TimeSpan.Zero ? "(over) " : "(missing) ") + Countdown.ToString(@"hh\:mm\:ss");
             TimeToLeaveLabel = TimeToLeave.ToShortTimeString();
         }
 

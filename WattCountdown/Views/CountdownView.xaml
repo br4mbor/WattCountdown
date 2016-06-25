@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:Abb.Cz.Apps.WattCountdown.Views"
       xmlns:ext="http://schemas.xceed.com/wpf/xaml/toolkit"
       xmlns:h="clr-namespace:Abb.Cz.Apps.WattCountdown.Helpers"
+      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
       mc:Ignorable="d"
       DataContext="{Binding CountdownViewModel, Source={StaticResource Locator}}"
       Title="Time to go home" Width="400">
@@ -13,6 +14,7 @@
         <h:DoubleToHoursConverter x:Key="HoursConverter"/>
         <h:TimeSpanToDateTimeConverter x:Key="TimeSpanToDateTimeConverter"/>
         <h:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+        <h:BoolInvertConverter x:Key="BoolInvertConverter"/>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -20,30 +22,44 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition Height="*"/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Date settings" Margin="10" Grid.Row="0">
+        <GroupBox Header="Controlling" Margin="10" Grid.Row="0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <ToggleButton Name="auto" Content="Auto WATT parsing" VerticalAlignment="Center" Padding="4" Margin="10" IsChecked="{Binding AutoModeEnabled}" IsEnabled="{Binding IsChecked, ElementName=manual, Converter={StaticResource BoolInvertConverter}}"/>
+                <ToggleButton Name="manual" Content="Manual input" VerticalAlignment="Center" Padding="4" Margin="10" IsChecked="{Binding ManualModeEnabled}" IsEnabled="{Binding IsChecked, ElementName=auto, Converter={StaticResource BoolInvertConverter}}" />
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Date settings" Margin="10" Grid.Row="1">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Date: " VerticalAlignment="Center"  />
-                <ext:DateTimeUpDown Value="{Binding SelectedDate}" Format="MonthDay" Margin="10" />
-                <Button Content="Today" VerticalAlignment="Center" Margin="10" />
+                <ext:DateTimeUpDown Value="{Binding SelectedDate, Mode=TwoWay}" Format="MonthDay" Margin="10" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="ValueChanged">
+                            <i:InvokeCommandAction Command="{Binding Path=DateChangedCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ext:DateTimeUpDown>
+                
+                <!--<Button Content="Restart" VerticalAlignment="Center" Margin="10" Command="{Binding DateChangedCommand}" />-->
+                <Button Content="Today" VerticalAlignment="Center" Margin="10" Command="{Binding TodayCommand}" />
             </StackPanel>
         </GroupBox>
-        <GroupBox Header="Time settings" Margin="10" Grid.Row="1">
+        <GroupBox Header="Time settings" Margin="10" Grid.Row="2">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Start:" VerticalAlignment="Center"/>
-                <ext:TimePicker IsEnabled="{Binding StartEnabled}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Start}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding IsChecked, ElementName=manual}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Start}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="Lunch:" VerticalAlignment="Center"/>
-                <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch, Converter={StaticResource TimeSpanToDateTimeConverter}}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding IsChecked, ElementName=manual}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding Lunch, Converter={StaticResource TimeSpanToDateTimeConverter}}" Format="Custom" FormatString="HH:mm"/>
                 <Label Content="End:" VerticalAlignment="Center"/>
-                <ext:TimePicker IsEnabled="False" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding EndTime, Mode=OneWay}" Format="Custom" FormatString="HH:mm"/>
+                <ext:TimePicker IsEnabled="{Binding IsChecked, ElementName=manual}" Margin="10" ShowDropDownButton="False" Width="60" Value="{Binding EndTime, Mode=OneWay}" Format="Custom" FormatString="HH:mm"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox HeaderStringFormat="Work time: {0}" Header="{Binding Value, ElementName=WorkTime, Converter={StaticResource HoursConverter}}" Margin="10" Grid.Row="2">
+        <GroupBox HeaderStringFormat="Work time: {0}" Header="{Binding Value, ElementName=WorkTime, Converter={StaticResource HoursConverter}}" Margin="10" Grid.Row="3">
             <Slider x:Name="WorkTime" IsEnabled="{Binding WorkTimeEnabled}" Margin="10" VerticalAlignment="Top" LargeChange="2" Maximum="16" SmallChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="True" Value="{Binding WorkTime}"/>
         </GroupBox>
-        <GroupBox Header="Time to go" Margin="10" Grid.Row="3">
+        <GroupBox Header="Time to go" Margin="10" Grid.Row="4">
             <StackPanel Orientation="Vertical">
                 <Label HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" FontSize="20" Visibility="{Binding CountdownVisible}" Content="{Binding TimeToLeaveLabel, Mode=OneWay}"/>
                 <Label HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -66,10 +82,10 @@
         <!--
             </StackPanel>
         </GroupBox>-->
-        <Label Content="{Binding ErrorMessage, Mode=OneWay}" Grid.Row="4" Visibility="{Binding ErrorVisible}" Height="40" VerticalAlignment="Center" Foreground="Red" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="5">
+        <Label Content="{Binding ErrorMessage, Mode=OneWay}" Grid.Row="5" Visibility="{Binding ErrorVisible}"  VerticalAlignment="Center" Foreground="Red" />
+        <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="5">
             <Button IsEnabled="{Binding StartButtonEnabled}" IsDefault="True" Margin="0,0,10,10" Width="60" Content="Start" Command="{Binding StartCommand}"/>
             <Button IsEnabled="{Binding StopButtonEnabled}" IsCancel="True" Margin="0,0,10,10" Width="60" Content="Stop" Command="{Binding StopCommand}"/>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Page>

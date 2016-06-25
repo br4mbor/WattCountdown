@@ -26,5 +26,7 @@ namespace Abb.Cz.Apps.WattCountdown.Views
         {
             InitializeComponent();
         }
+
+        
     }
 }

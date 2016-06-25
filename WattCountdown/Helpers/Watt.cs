@@ -25,7 +25,7 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
         {
             var responseUrl = LoginAndGetResponseUrl();
 
-            var reportUrl = new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=1");
+            var reportUrl = new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=2");
             var reportResponse = GetResponseFromWattRequest(reportUrl, RequestMethod.Get);
             var reportRawHtml = GetRawStringFromResponse(reportResponse);
             return reportRawHtml;

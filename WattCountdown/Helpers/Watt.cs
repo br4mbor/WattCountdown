@@ -24,6 +24,27 @@ namespace Abb.Cz.Apps.WattCountdown.Helpers
             _password = password;
         }
 
+        public string LoginAndGetReportHtml()
+        {
+            var responseUrl = LoginAndGetResponseUrl();
+
+            var reportUrl = new Uri(WattReportUrl + responseUrl.Substring(responseUrl.IndexOf("=-")) + "&repId=1");
+            var reportResponse = GetResponseFromWattRequest(reportUrl, RequestMethod.Get);
+            var reportRawHtml = GetRawStringFromResponse(reportResponse);
+            return reportRawHtml;
+        }
+
+        private string LoginAndGetResponseUrl()
+        {
+            var response = GetResponseFromWattRequest(new Uri(WattLoginUrl), RequestMethod.Post, $"app=&username={_userName}&password={_password}");
+            var responseUrl = response.ResponseUri.ToString();
+
+            response.Close();
+
+            return responseUrl;
+        }
+
+
         public UserInformation GetUserInformation()
         {
             try

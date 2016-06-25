@@ -9,7 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Abb.Cz.Apps.WattCountdown.Helpers;
+using Abb.Cz.Apps.WattCountdown.Interfaces;
 using Abb.Cz.Apps.WattCountdown.Services;
+using GalaSoft.MvvmLight.Ioc;
 
 namespace Abb.Cz.Apps.WattCountdown.ViewModels
 {
@@ -212,7 +215,11 @@ namespace Abb.Cz.Apps.WattCountdown.ViewModels
 
         private void PrepareData()
         {
-            var parser = new WattParser(File.ReadAllText("D:\\WATT.htm"));
+            //var settingsService = SimpleIoc.Default.GetInstance<ISettingsService>();
+            //var getter = new Watt(settingsService.UserName, settingsService.Password);
+            //var reportHtml = getter.LoginAndGetReportHtml();
+            var reportHtml = File.ReadAllText("D:\\WATT2.htm");
+            var parser = new WattParser(reportHtml);
             var entries = parser.ParseEntries(SelectedDate);
             if (entries.First().Type != EntryType.Prichod)
                 throw new Exception("First entry is not of type 'Prichod'");

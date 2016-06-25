@@ -22,16 +22,12 @@ namespace Abb.Cz.Apps.WattCountdown.Services
 
         public List<WattEntry> ParseEntries(DateTime dateToParse)
         {
-            //FileInfo file = new FileInfo("D:\\WATTSestavy.htm");
             HtmlAgilityPack.HtmlDocument html = new HtmlAgilityPack.HtmlDocument();
             html.OptionDefaultStreamEncoding = Encoding.UTF8;
             
-            //html.Load("D:\\WATT.htm");
             html.LoadHtml(ReportHtml);
             var nodes = html.DocumentNode.SelectNodes("//td[@class='day']"); //[class='page']");
-            //var today = nodes.Single(td => td.InnerText.Contains($"&nbsp;{DateTime.Now.Date.Day}."));
             var today = nodes.Single(td => td.InnerText.Contains($"&nbsp;{dateToParse.Day}."));
-            //var entries = today.SelectNodes(".//td");
             var todayEntries = today.ParentNode.ParentNode.ParentNode.SelectNodes(".//td");
 
             var entries = new List<WattEntry>();

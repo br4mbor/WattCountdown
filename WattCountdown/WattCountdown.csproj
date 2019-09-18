@@ -109,6 +109,7 @@
     <Compile Include="Helpers\DoubleToHoursConverter.cs" />
     <Compile Include="Helpers\TimeSpanToDateTimeConverter.cs" />
     <Compile Include="Helpers\TimeSpanToStringConverter.cs" />
+    <Compile Include="Helpers\BoolInvertConverter.cs" />
     <Compile Include="Helpers\UserInformation.cs" />
     <Compile Include="Helpers\Watt.cs" />
     <Compile Include="Interfaces\ISettingsService.cs" />
@@ -117,6 +118,7 @@
     </Compile>
     <Compile Include="Models\CountdownModel.cs" />
     <Compile Include="Services\LocalSettingsService.cs" />
+    <Compile Include="Services\WattParser.cs" />
     <Compile Include="ViewModels\CountdownViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
